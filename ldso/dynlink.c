@@ -25,6 +25,8 @@
 #include "dynlink.h"
 #include "malloc_impl.h"
 
+void __ccfi_init(void);
+
 static void error(const char *, ...);
 
 #define MAXP2(a,b) (-(-(a)&-(b)))
@@ -1667,6 +1669,10 @@ hidden void __dls2(unsigned char *base, size_t *sp)
 
 void __dls2b(size_t *sp, size_t *auxv)
 {
+        /* Initialize CCFI now, before the first syscall is made during
+         * TLS setup. */
+        __ccfi_init();
+
 	/* Setup early thread pointer in builtin_tls for ldso/libc itself to
 	 * use during dynamic linking. If possible it will also serve as the
 	 * thread pointer at runtime. */

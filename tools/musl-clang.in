@@ -1,35 +1,58 @@
-#!/bin/sh
+#!/bin/bash
 cc="@CC@"
 libc="@PREFIX@"
 libc_inc="@INCDIR@"
 libc_lib="@LIBDIR@"
 thisdir="`cd "$(dirname "$0")"; pwd`"
 
-# prevent clang from running the linker (and erroring) on no input.
-sflags=
-eflags=
-for x ; do
-    case "$x" in
-        -l*) input=1 ;;
-        *) input= ;;
+args=("$@")
+
+maybe_linking=1
+while [ $# -gt 0 ]; do
+    case "${1}" in
+        -c)
+            maybe_linking=0
+        ;;
+        -l*)
+            sflags=("-l-user-start")
+            eflags=("-l-user-end")
+        ;;
+        -v)
+            maybe_linking=0
+        ;;
+        -S)
+            maybe_linking=0
+        ;;
+        -E)
+            maybe_linking=0
+        ;;
     esac
-    if test "$input" ; then
-        sflags="-l-user-start"
-        eflags="-l-user-end"
-        break
-    fi
+    shift
 done
 
-exec $cc \
-    -B"$thisdir" \
-    -fuse-ld=musl-clang \
-    -static-libgcc \
-    -nostdinc \
-    --sysroot "$libc" \
-    -isystem "$libc_inc" \
-    -L-user-start \
-    $sflags \
-    "$@" \
-    $eflags \
-    -L"$libc_lib" \
-    -L-user-end
+args+=("--sysroot=${libc}")
+
+if [ ${maybe_linking} -ne 0 ]; then
+    args+=("-B${this_dir}")
+    args+=("-fuse-ld=musl-clang")
+    args+=("-static-libgcc")
+    eflags+=("-L${libc_lib}")
+fi
+
+args+=("-nostdinc")
+args+=("-isystem")
+args+=("${libc_inc}")
+
+if [ ${maybe_linking} -ne 0 ]; then
+    args+=("-L-user-start")
+    args+=("${sflags[@]}")
+fi
+
+args+="$@"
+
+if [ ${maybe_linking} -ne 0 ]; then
+    args+=("${eflags[@]}")
+    args+=("-L-user-end")
+fi
+
+exec ${cc} "${args[@]}"

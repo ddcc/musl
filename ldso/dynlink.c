@@ -29,6 +29,8 @@
 #define realloc __libc_realloc
 #define free __libc_free
 
+void __hq_init(int fork);
+
 static void error(const char *, ...);
 
 #define MAXP2(a,b) (-(-(a)&-(b)))
@@ -1705,6 +1707,9 @@ hidden void __dls2(unsigned char *base, size_t *sp)
 
 void __dls2b(size_t *sp, size_t *auxv)
 {
+	/* Initialize HerQules before any system calls occur. */
+	__hq_init(0);
+
 	/* Setup early thread pointer in builtin_tls for ldso/libc itself to
 	 * use during dynamic linking. If possible it will also serve as the
 	 * thread pointer at runtime. */

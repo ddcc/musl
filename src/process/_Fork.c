@@ -9,6 +9,8 @@
 static void dummy(int x) { }
 weak_alias(dummy, __aio_atfork);
 
+void __hq_init(int fork);
+
 pid_t _Fork(void)
 {
 	pid_t ret;
@@ -22,6 +24,9 @@ pid_t _Fork(void)
 	ret = __syscall(SYS_clone, SIGCHLD, 0);
 #endif
 	if (!ret) {
+		// Reinitialize after fork
+		__hq_init(1);
+
 		pthread_t self = __pthread_self();
 		self->tid = __syscall(SYS_gettid);
 		self->robust_list.off = 0;

@@ -18,12 +18,8 @@ __syscall_cp_asm:
 	mov %r8,%r15
 	push %r9
 
-	movl $5,%edi
+	movl $7,%edi
 	mov %rdi,%gs:0x0
-	movl $6,%esi
-	mov %rsi,%gs:0x8
-	movl $7,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 __cp_begin:

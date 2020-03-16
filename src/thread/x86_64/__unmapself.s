@@ -7,12 +7,8 @@ __unmapself:
 	mov %rdi,%rbx
 	mov %rsi,%r12
 
-	movl $1,%edi
+	movl $5,%edi
 	mov %rdi,%gs:0x0
-	movl $2,%esi
-	mov %rsi,%gs:0x8
-	movl $3,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 	mov %rbx,%rdi
@@ -20,12 +16,8 @@ __unmapself:
 	movl $11,%eax   /* SYS_munmap */
 	syscall         /* munmap(arg2,arg3) */
 
-	movl $2,%edi
+	movl $6,%edi
 	mov %rdi,%gs:0x0
-	movl $3,%esi
-	mov %rsi,%gs:0x8
-	movl $4,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 	xor %edi,%edi   /* exit() args: always return success */

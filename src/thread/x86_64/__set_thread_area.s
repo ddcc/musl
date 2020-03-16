@@ -7,12 +7,8 @@
 __set_thread_area:
 	mov %rdi,%rbx
 
-	xor %edi,%edi
+	movl $1,%edi
 	mov %rdi,%gs:0x0
-	movl $1,%esi
-	mov %rsi,%gs:0x8
-	movl $2,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 	mov %rbx,%rsi           /* shift for syscall */

@@ -13,10 +13,6 @@ __clone:
 
 	movl $3,%edi
 	mov %rdi,%gs:0x0
-	movl $4,%esi
-	mov %rsi,%gs:0x8
-	movl $5,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 	mov %rbx,%r9
@@ -44,10 +40,6 @@ __clone:
 
 	movl $4,%edi
 	mov %rdi,%gs:0x0
-	movl $5,%esi
-	mov %rsi,%gs:0x8
-	movl $6,%edx
-	mov %rdx,%gs:0x10
 	call __ccfi_syscall
 
 	mov %ebx,%edi

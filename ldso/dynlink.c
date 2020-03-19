@@ -1675,6 +1675,10 @@ void __dls2b(size_t *sp, size_t *auxv)
 		a_crash();
 	}
 
+	/* Initialize CCFI after TLS is initialized and %gs register is set.
+	 * Otherwise, calls to e.g. pthread_self() will trigger SIGSEGV. */
+	__ccfi_init();
+
 	struct symdef dls3_def = find_sym(&ldso, "__dls3", 0);
 	if (DL_FDPIC) ((stage3_func)&ldso.funcdescs[dls3_def.sym-ldso.syms])(sp, auxv);
 	else ((stage3_func)laddr(&ldso, dls3_def.sym->st_value))(sp, auxv);

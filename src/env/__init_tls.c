@@ -9,6 +9,16 @@
 #include "atomic.h"
 #include "syscall.h"
 
+inline long
+__ccfi_raw_syscall1(long num, const uintptr_t a1) {
+	long ret;
+	__asm__ volatile("syscall"
+					: "=a"(ret)
+					: "0"(num), "D"(a1)
+					: "memory", "cc", "r11", "cx");
+	return ret;
+}
+
 volatile int __thread_list_lock;
 
 int __init_tp(void *p)
@@ -19,7 +29,7 @@ int __init_tp(void *p)
 	if (r < 0) return -1;
 	if (!r) libc.can_do_threads = 1;
 	td->detach_state = DT_JOINABLE;
-	td->tid = __syscall(SYS_set_tid_address, &__thread_list_lock);
+	td->tid = __ccfi_raw_syscall1(SYS_set_tid_address, &__thread_list_lock);
 	td->locale = &libc.global_locale;
 	td->robust_list.head = &td->robust_list.head;
 	td->sysinfo = __sysinfo;

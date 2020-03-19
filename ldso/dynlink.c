@@ -1669,10 +1669,6 @@ hidden void __dls2(unsigned char *base, size_t *sp)
 
 void __dls2b(size_t *sp, size_t *auxv)
 {
-        /* Initialize CCFI now, before the first syscall is made during
-         * TLS setup. */
-        __ccfi_init();
-
 	/* Setup early thread pointer in builtin_tls for ldso/libc itself to
 	 * use during dynamic linking. If possible it will also serve as the
 	 * thread pointer at runtime. */
@@ -1683,6 +1679,10 @@ void __dls2b(size_t *sp, size_t *auxv)
 	if (__init_tp(__copy_tls((void *)builtin_tls)) < 0) {
 		a_crash();
 	}
+
+	/* Initialize CCFI after TLS is initialized and %gs register is set.
+	 * Otherwise, calls to e.g. pthread_self() will trigger SIGSEGV. */
+	__ccfi_init();
 
 	struct symdef dls3_def = find_sym(&ldso, "__dls3", 0);
 	if (DL_FDPIC) ((stage3_func)&ldso.funcdescs[dls3_def.sym-ldso.syms])(sp, auxv);

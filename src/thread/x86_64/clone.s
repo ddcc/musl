@@ -4,47 +4,54 @@
 .hidden __clone
 .type   __clone,@function
 __clone:
-	mov %rdi,%rbx
-	mov %rsi,%r12
-	mov %rdx,%r13
+	# Save arguments onto the stack, for __ccfi_syscall()
+	push %rdi
+	push %rsi
+	push %rdx
 	push %rcx
-	mov %r8,%r14
-	mov %r9,%r15
+	push %r8
+	push %r9
 
-	movl $3,%edi
+	movl $1000,%edi
 	mov %rdi,%gs:0x0
 	call __ccfi_syscall
 
-	mov %rbx,%r9
-	mov %r12,%rsi
-	mov %r13,%rdi
+	# Restore saved arguments, for clone()
+	pop %r8
+	pop %rdx
 	pop %rcx
-	mov %r14,%rdx
-	mov %r15,%r8
+	pop %rdi
+	pop %rsi
+	pop %r9
 
 	xor %eax,%eax
 	mov $56,%al
-	mov 8(%rsp),%r10
+	mov 56(%rsp),%r10
 	and $-16,%rsi
 	sub $8,%rsi
 	mov %rcx,(%rsi)
 	syscall
 
 	test %eax,%eax
-	jnz 1f
+	jnz end
 	xor %ebp,%ebp
 	pop %rdi
 	call *%r9
 
+	# Save return value into callee-preserved register, for __ccfi_syscall()
 	mov %eax,%ebx
 
-	movl $4,%edi
+	movl $1001,%edi
 	mov %rdi,%gs:0x0
 	call __ccfi_syscall
 
+	# Restore saved arguments, for exit()
 	mov %ebx,%edi
+
 	xor %eax,%eax
 	mov $60,%al
 	syscall
 	hlt
-1:	ret
+
+end:
+	ret

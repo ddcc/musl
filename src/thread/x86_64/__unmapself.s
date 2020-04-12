@@ -4,19 +4,21 @@
 .global __unmapself
 .type   __unmapself,@function
 __unmapself:
+	# Save arguments into callee-preserved registers, for __ccfi_syscall()
 	mov %rdi,%rbx
 	mov %rsi,%r12
 
-	movl $5,%edi
+	movl $1002,%edi
 	mov %rdi,%gs:0x0
 	call __ccfi_syscall
 
+	# Restore saved arguments, for munmap()
 	mov %rbx,%rdi
 	mov %r12,%rsi
 	movl $11,%eax   /* SYS_munmap */
 	syscall         /* munmap(arg2,arg3) */
 
-	movl $6,%edi
+	movl $1003,%edi
 	mov %rdi,%gs:0x0
 	call __ccfi_syscall
 

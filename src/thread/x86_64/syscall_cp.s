@@ -11,32 +11,38 @@
 .hidden __syscall_cp_asm
 .type   __syscall_cp_asm,@function
 __syscall_cp_asm:
-	mov %rdi,%rbx
-	mov %rsi,%r12
-	mov %rdx,%r13
-	mov %rcx,%r14
-	mov %r8,%r15
+	mov (%rdi),%eax
+	test %eax,%eax
+	jnz __cp_cancel
+
+	# Save arguments onto the stack
+	push %rdi
+	push %rsi
+	push %rdx
+	push %rcx
+	push %r8
 	push %r9
 
-	movl $7,%edi
+	movl $1004,%edi
 	mov %rdi,%gs:0x0
 	call __ccfi_syscall
 
-__cp_begin:
-	mov (%rbx),%eax
-	test %eax,%eax
-	jnz __cp_cancel
-	mov %rbx,%r11
-	mov %r12,%rax
-	mov %r13,%rdi
-	mov %r14,%rsi
-	mov %r15,%rdx
+	# Restore saved arguments, for syscall
 	pop %r10
+	pop %rdx
+	pop %rsi
+	pop %rdi
+	pop %rax
+	pop %r11
+
+__cp_begin:
 	mov 8(%rsp),%r8
 	mov 16(%rsp),%r9
 	mov %r11,8(%rsp)
 	syscall
+
 __cp_end:
 	ret
+
 __cp_cancel:
 	jmp __cancel

@@ -1,4 +1,5 @@
 .text
+.extern __ccfi_update_pid
 .extern __ccfi_syscall
 .global __clone
 .hidden __clone
@@ -36,8 +37,12 @@ __clone:
 	jnz end
 	xor %ebp,%ebp
 	pop %rdi
-	call *%r9
 
+	mov %r9,%rbx
+	# Update PID after system call
+	call __ccfi_update_pid
+
+	call *%rbx
 	# Save return value into callee-preserved register, for __ccfi_syscall()
 	mov %eax,%ebx
 

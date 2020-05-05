@@ -5,11 +5,16 @@
 #include "libc.h"
 #include "pthread_impl.h"
 
+void __ccfi_update_pid();
+
 static void dummy(int x)
 {
 }
 
+static void dummy2(void) {}
+
 weak_alias(dummy, __fork_handler);
+weak_alias(dummy2, __ccfi_update_pid);
 
 pid_t fork(void)
 {
@@ -23,6 +28,8 @@ pid_t fork(void)
 	ret = __syscall(SYS_clone, SIGCHLD, 0);
 #endif
 	if (!ret) {
+		__ccfi_update_pid();
+
 		pthread_t self = __pthread_self();
 		self->tid = __syscall(SYS_gettid);
 		self->robust_list.off = 0;

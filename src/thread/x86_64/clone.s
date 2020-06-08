@@ -1,11 +1,11 @@
 .text
-.extern __ccfi_update_pid
-.extern __ccfi_syscall
+.extern __cfi_update_pid
+.extern __cfi_syscall
 .global __clone
 .hidden __clone
 .type   __clone,@function
 __clone:
-	# Save arguments onto the stack, for __ccfi_syscall()
+	# Save arguments onto the stack, for __cfi_syscall()
 	push %rdi
 	push %rsi
 	push %rdx
@@ -15,7 +15,7 @@ __clone:
 
 	movl $1000,%edi
 	mov %rdi,%gs:0x0
-	call __ccfi_syscall
+	call __cfi_syscall
 
 	# Restore saved arguments, for clone()
 	pop %r8
@@ -40,15 +40,15 @@ __clone:
 
 	mov %r9,%rbx
 	# Update PID after system call
-	call __ccfi_update_pid
+	call __cfi_update_pid
 
 	call *%rbx
-	# Save return value into callee-preserved register, for __ccfi_syscall()
+	# Save return value into callee-preserved register, for __cfi_syscall()
 	mov %eax,%ebx
 
 	movl $1001,%edi
 	mov %rdi,%gs:0x0
-	call __ccfi_syscall
+	call __cfi_syscall
 
 	# Restore saved arguments, for exit()
 	mov %ebx,%edi

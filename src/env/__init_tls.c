@@ -10,7 +10,7 @@
 #include "syscall.h"
 
 inline long
-__ccfi_raw_syscall1(long num, const uintptr_t a1) {
+__cfi_raw_syscall1(long num, const uintptr_t a1) {
 	long ret;
 	__asm__ volatile("syscall"
 					: "=a"(ret)
@@ -29,7 +29,7 @@ int __init_tp(void *p)
 	if (r < 0) return -1;
 	if (!r) libc.can_do_threads = 1;
 	td->detach_state = DT_JOINABLE;
-	td->tid = __ccfi_raw_syscall1(SYS_set_tid_address, &__thread_list_lock);
+	td->tid = __cfi_raw_syscall1(SYS_set_tid_address, &__thread_list_lock);
 	td->locale = &libc.global_locale;
 	td->robust_list.head = &td->robust_list.head;
 	td->sysinfo = __sysinfo;

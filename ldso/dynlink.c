@@ -24,6 +24,8 @@
 #include "libc.h"
 #include "dynlink.h"
 
+void __cfi_init(void);
+
 static void error(const char *, ...);
 
 #define MAXP2(a,b) (-(-(a)&-(b)))
@@ -1675,9 +1677,9 @@ void __dls2b(size_t *sp, size_t *auxv)
 		a_crash();
 	}
 
-	/* Initialize CCFI after TLS is initialized and %gs register is set.
+	/* Initialize CFI after TLS is initialized and %gs register is set.
 	 * Otherwise, calls to e.g. pthread_self() will trigger SIGSEGV. */
-	__ccfi_init();
+	__cfi_init();
 
 	struct symdef dls3_def = find_sym(&ldso, "__dls3", 0);
 	if (DL_FDPIC) ((stage3_func)&ldso.funcdescs[dls3_def.sym-ldso.syms])(sp, auxv);

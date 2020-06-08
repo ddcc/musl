@@ -1,16 +1,16 @@
 /* Copyright 2011-2012 Nicholas J. Kain, licensed under standard MIT license */
 .text
-.extern __ccfi_syscall
+.extern __cfi_syscall
 .global __unmapself
 .type   __unmapself,@function
 __unmapself:
-	# Save arguments into callee-preserved registers, for __ccfi_syscall()
+	# Save arguments into callee-preserved registers, for __cfi_syscall()
 	mov %rdi,%rbx
 	mov %rsi,%r12
 
 	movl $1002,%edi
 	mov %rdi,%gs:0x0
-	call __ccfi_syscall
+	call __cfi_syscall
 
 	# Restore saved arguments, for munmap()
 	mov %rbx,%rdi
@@ -20,7 +20,7 @@ __unmapself:
 
 	movl $1003,%edi
 	mov %rdi,%gs:0x0
-	call __ccfi_syscall
+	call __cfi_syscall
 
 	xor %edi,%edi   /* exit() args: always return success */
 	movl $60,%eax   /* SYS_exit */

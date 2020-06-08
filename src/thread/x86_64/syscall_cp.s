@@ -1,5 +1,5 @@
 .text
-.extern __ccfi_syscall
+.extern __cfi_syscall
 .global __cp_begin
 .hidden __cp_begin
 .global __cp_end
@@ -25,7 +25,7 @@ __syscall_cp_asm:
 
 	movl $1004,%edi
 	mov %rdi,%gs:0x0
-	call __ccfi_syscall
+	call __cfi_syscall
 
 	# Restore saved arguments, for syscall
 	pop %r10

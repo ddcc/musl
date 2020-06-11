@@ -5,21 +5,17 @@
 .type   __unmapself,@function
 __unmapself:
 	# Save arguments into callee-preserved registers, for __cfi_syscall()
-	mov %rdi,%rbx
-	mov %rsi,%r12
+	mov %rdi,%r15
+	mov %rsi,%r14
 
-	movl $1002,%edi
-	mov %rdi,%gs:0x0
 	call __cfi_syscall
 
 	# Restore saved arguments, for munmap()
-	mov %rbx,%rdi
-	mov %r12,%rsi
+	mov %r14,%rsi
+	mov %r15,%rdi
 	movl $11,%eax   /* SYS_munmap */
 	syscall         /* munmap(arg2,arg3) */
 
-	movl $1003,%edi
-	mov %rdi,%gs:0x0
 	call __cfi_syscall
 
 	xor %edi,%edi   /* exit() args: always return success */

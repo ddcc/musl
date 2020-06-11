@@ -276,14 +276,17 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
 	}
 
 	if (!tsd) {
-		map = __mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
-		if (map == MAP_FAILED) goto fail;
 		if (guard) {
-			if (__mprotect(map, guard, PROT_NONE)
+			map = __mmap(0, size, PROT_NONE, MAP_PRIVATE|MAP_ANON, -1, 0);
+			if (map == MAP_FAILED) goto fail;
+			if (__mprotect(map+guard, size-guard, PROT_READ|PROT_WRITE)
 			    && errno != ENOSYS) {
 				__munmap(map, size);
 				goto fail;
 			}
+		} else {
+			map = __mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
+			if (map == MAP_FAILED) goto fail;
 		}
 		tsd = map + size - __pthread_tsd_size;
 		if (!stack) {

@@ -13,8 +13,6 @@ __clone:
 	push %r8
 	push %r9
 
-	movl $1000,%edi
-	mov %rdi,%gs:0x0
 	call __cfi_syscall
 
 	# Restore saved arguments, for clone()
@@ -46,8 +44,6 @@ __clone:
 	# Save return value into callee-preserved register, for __cfi_syscall()
 	mov %eax,%ebx
 
-	movl $1001,%edi
-	mov %rdi,%gs:0x0
 	call __cfi_syscall
 
 	# Restore saved arguments, for exit()

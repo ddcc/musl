@@ -23,8 +23,6 @@ __syscall_cp_asm:
 	push %r8
 	push %r9
 
-	movl $1004,%edi
-	mov %rdi,%gs:0x0
 	call __cfi_syscall
 
 	# Restore saved arguments, for syscall

@@ -6,6 +6,8 @@
 
 #ifdef VDSO_CGT_SYM
 
+void __cfi_syscall();
+
 static void *volatile vdso_func;
 
 #ifdef VDSO_CGT32_SYM
@@ -61,6 +63,7 @@ int __clock_gettime(clockid_t clk, struct timespec *ts)
 	int (*f)(clockid_t, struct timespec *) =
 		(int (*)(clockid_t, struct timespec *))vdso_func;
 	if (f) {
+		__cfi_syscall();
 		r = f(clk, ts);
 		if (!r) return r;
 		if (r == -EINVAL) return __syscall_ret(r);

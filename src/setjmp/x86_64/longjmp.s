@@ -1,6 +1,7 @@
 /* Copyright 2011-2012 Nicholas J. Kain, licensed under standard MIT license */
 .global _longjmp
 .global longjmp
+.extern __cfi_pointer_check
 .type _longjmp,@function
 .type longjmp,@function
 _longjmp:
@@ -10,6 +11,15 @@ longjmp:
 	jnz 1f
 	inc %rax                /* if val==0, val=1 per longjmp semantics */
 1:
+
+	mov %rdi,%rbx
+	mov %rax,%rbp
+	lea 56(%rdi),%rdi
+	mov (%rdi),%rsi
+	call __cfi_pointer_check
+	mov %rbp,%rax
+	mov %rbx,%rdi
+
 	mov (%rdi),%rbx         /* rdi is the jmp_buf, restore regs from it */
 	mov 8(%rdi),%rbp
 	mov 16(%rdi),%r12

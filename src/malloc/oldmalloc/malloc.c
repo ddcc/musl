@@ -527,3 +527,7 @@ void __malloc_donate(char *start, char *end)
 	c->csize = n->psize = C_INUSE | (end-start);
 	__bin_chunk(c);
 }
+
+weak_alias(free, __libc_free);
+weak_alias(malloc, __libc_malloc);
+weak_alias(realloc, __libc_realloc);

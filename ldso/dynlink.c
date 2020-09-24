@@ -1344,10 +1344,32 @@ static void do_mips_relocs(struct dso *p, size_t *got)
 
 static void reloc_all(struct dso *p)
 {
+	unsigned char textrel = 0;
 	size_t dyn[DYN_CNT];
 	for (; p; p=p->next) {
 		if (p->relocated) continue;
 		decode_vec(p->dynv, dyn, DYN_CNT);
+
+		if ((dyn[0] & 1<<DT_TEXTREL) || (dyn[DT_FLAGS] & DF_TEXTREL)) {
+			size_t cnt = p->phnum;
+			Phdr *ph = p->phdr;
+			for (; cnt--; ph = (void *)((char *)ph + p->phentsize)) {
+				if (ph->p_type == PT_LOAD && !(ph->p_flags & PF_W)) {
+					unsigned prot = (((ph->p_flags&PF_R) ? PROT_READ : 0) |
+									((ph->p_flags&PF_X) ? PROT_EXEC : 0));
+					size_t start = ph->p_vaddr & -PAGE_SIZE,
+					       end = (ph->p_vaddr + ph->p_memsz + PAGE_SIZE-1) & -PAGE_SIZE;
+					if (mprotect(laddr(p, start), end - start, prot|PROT_WRITE)
+						&& errno != ENOSYS) {
+						error("Error relocating %s: TEXTREL unprotect failed: %m",
+						p->name);
+						if (runtime) longjmp(*rtld_fail, 1);
+					}
+					textrel = 1;
+				}
+			}
+		}
+
 		if (NEED_MIPS_GOT_RELOCS)
 			do_mips_relocs(p, laddr(p, dyn[DT_PLTGOT]));
 		do_relocs(p, laddr(p, dyn[DT_JMPREL]), dyn[DT_PLTRELSZ],
@@ -1361,6 +1383,25 @@ static void reloc_all(struct dso *p)
 			error("Error relocating %s: RELRO protection failed: %m",
 				p->name);
 			if (runtime) longjmp(*rtld_fail, 1);
+		}
+
+		if (textrel) {
+			size_t cnt = p->phnum;
+			Phdr *ph = p->phdr;
+			for (; cnt--; ph = (void *)((char *)ph + p->phentsize)) {
+				if (ph->p_type == PT_LOAD && !(ph->p_flags & PF_W)) {
+					unsigned prot = (((ph->p_flags&PF_R) ? PROT_READ : 0) |
+									((ph->p_flags&PF_X) ? PROT_EXEC : 0));
+					size_t start = ph->p_vaddr & -PAGE_SIZE,
+					       end = (ph->p_vaddr + ph->p_memsz + PAGE_SIZE-1) & -PAGE_SIZE;
+					if (mprotect(laddr(p, start), end - start, prot)
+						&& errno != ENOSYS) {
+						error("Error relocating %s: TEXTREL protect failed: %m",
+						p->name);
+						if (runtime) longjmp(*rtld_fail, 1);
+					}
+				}
+			}
 		}
 
 		p->relocated = 1;

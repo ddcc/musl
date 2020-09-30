@@ -1,7 +1,7 @@
 /* Copyright 2011-2012 Nicholas J. Kain, licensed under standard MIT license */
 .global _longjmp
 .global longjmp
-.extern __cfi_pointer_check
+.extern __hq_pointer_check
 .type _longjmp,@function
 .type longjmp,@function
 _longjmp:
@@ -16,7 +16,7 @@ longjmp:
 	mov %rax,%rbp
 	lea 56(%rdi),%rdi
 	mov (%rdi),%rsi
-	call __cfi_pointer_check
+	call __hq_pointer_check
 	mov %rbp,%rax
 	mov %rbx,%rdi
 

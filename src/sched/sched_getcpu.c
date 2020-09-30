@@ -6,7 +6,7 @@
 
 #ifdef VDSO_GETCPU_SYM
 
-void __cfi_syscall();
+void __hq_syscall();
 
 static void *volatile vdso_func;
 
@@ -32,7 +32,7 @@ int sched_getcpu(void)
 #ifdef VDSO_GETCPU_SYM
 	getcpu_f f = (getcpu_f)vdso_func;
 	if (f) {
-		__cfi_syscall();
+		__hq_syscall();
 		r = f(&cpu, 0, 0);
 		if (!r) return cpu;
 		if (r != -ENOSYS) return __syscall_ret(r);

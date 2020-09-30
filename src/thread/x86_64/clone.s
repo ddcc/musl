@@ -1,11 +1,11 @@
 .text
-.extern __cfi_update_pid
-.extern __cfi_syscall
+.extern __hq_update_pid
+.extern __hq_syscall
 .global __clone
 .hidden __clone
 .type   __clone,@function
 __clone:
-	# Save arguments onto the stack, for __cfi_syscall()
+	# Save arguments onto the stack, for __hq_syscall()
 	push %rdi
 	push %rsi
 	push %rdx
@@ -13,7 +13,7 @@ __clone:
 	push %r8
 	push %r9
 
-	call __cfi_syscall
+	call __hq_syscall
 
 	# Restore saved arguments, for clone()
 	pop %r8
@@ -38,13 +38,13 @@ __clone:
 
 	mov %r9,%rbx
 	# Update PID after system call
-	call __cfi_update_pid
+	call __hq_update_pid
 
 	call *%rbx
-	# Save return value into callee-preserved register, for __cfi_syscall()
+	# Save return value into callee-preserved register, for __hq_syscall()
 	mov %eax,%ebx
 
-	call __cfi_syscall
+	call __hq_syscall
 
 	# Restore saved arguments, for exit()
 	mov %ebx,%edi

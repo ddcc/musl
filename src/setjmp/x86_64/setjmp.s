@@ -2,7 +2,7 @@
 .global __setjmp
 .global _setjmp
 .global setjmp
-.extern __cfi_pointer_define
+.extern __hq_cfi_pointer_define
 .type __setjmp,@function
 .type _setjmp,@function
 .type setjmp,@function
@@ -21,7 +21,7 @@ setjmp:
 	mov %rsi,56(%rdi)
 
 	lea 56(%rdi),%rdi
-	call __cfi_pointer_define
+	call __hq_cfi_pointer_define
 
 	xor %rax,%rax           /* always return 0 */
 	ret

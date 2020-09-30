@@ -1,5 +1,5 @@
 .text
-.extern __cfi_syscall
+.extern __hq_syscall
 .global __cp_begin
 .hidden __cp_begin
 .global __cp_end
@@ -23,7 +23,7 @@ __syscall_cp_asm:
 	push %r8
 	push %r9
 
-	call __cfi_syscall
+	call __hq_syscall
 
 	# Restore saved arguments, for syscall
 	pop %r10

@@ -21,11 +21,11 @@ __clone:
 	pop %rcx
 	pop %rdi
 	pop %rsi
-	pop %r9
+	pop %rbx
 
 	xor %eax,%eax
 	mov $56,%al
-	mov 56(%rsp),%r10
+	mov 8(%rsp),%r10
 	and $-16,%rsi
 	sub $8,%rsi
 	mov %rcx,(%rsi)
@@ -36,7 +36,6 @@ __clone:
 	xor %ebp,%ebp
 	pop %rdi
 
-	mov %r9,%rbx
 	# Update PID after system call
 	call __hq_update_pid
 

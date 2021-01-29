@@ -15,9 +15,6 @@ __unmapself:
 	mov %r15,%rdi
 	movl $11,%eax   /* SYS_munmap */
 	syscall         /* munmap(arg2,arg3) */
-
-	call __hq_syscall
-
-	xor %edi,%edi   /* exit() args: always return success */
+	xor %rdi,%rdi   /* exit() args: always return success */
 	movl $60,%eax   /* SYS_exit */
 	syscall         /* exit(0) */

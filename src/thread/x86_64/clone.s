@@ -40,14 +40,7 @@ __clone:
 	call __hq_update_pid
 
 	call *%rbx
-	# Save return value into callee-preserved register, for __hq_syscall()
-	mov %eax,%ebx
-
-	call __hq_syscall
-
-	# Restore saved arguments, for exit()
-	mov %ebx,%edi
-
+	mov %eax,%edi
 	xor %eax,%eax
 	mov $60,%al
 	syscall

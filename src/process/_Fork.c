@@ -9,18 +9,14 @@
 static void dummy(int x) { }
 weak_alias(dummy, __aio_atfork);
 
-pid_t _Fork(void)
+pid_t _Fork(int (*func)(void *), void *arg)
 {
 	pid_t ret;
 	sigset_t set;
 	__block_all_sigs(&set);
 	__aio_atfork(-1);
 	LOCK(__abort_lock);
-#ifdef SYS_fork
-	ret = __syscall(SYS_fork);
-#else
-	ret = __syscall(SYS_clone, SIGCHLD, 0);
-#endif
+	ret = (*func)(arg);
 	if (!ret) {
 		pthread_t self = __pthread_self();
 		self->tid = __syscall(SYS_gettid);

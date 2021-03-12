@@ -11,18 +11,14 @@ weak_alias(dummy, __aio_atfork);
 
 void __hq_init(int fork);
 
-pid_t _Fork(void)
+pid_t _Fork(int (*func)(void *), void *arg)
 {
 	pid_t ret;
 	sigset_t set;
 	__block_all_sigs(&set);
 	__aio_atfork(-1);
 	LOCK(__abort_lock);
-#ifdef SYS_fork
-	ret = __syscall(SYS_fork);
-#else
-	ret = __syscall(SYS_clone, SIGCHLD, 0);
-#endif
+	ret = (*func)(arg);
 	if (!ret) {
 		// Reinitialize after fork
 		__hq_init(1);

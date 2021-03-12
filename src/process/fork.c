@@ -44,6 +44,14 @@ static void dummy_0(void) { }
 weak_alias(dummy_0, __tl_lock);
 weak_alias(dummy_0, __tl_unlock);
 
+int do_fork(void *arg) {
+#ifdef SYS_fork
+	return __syscall(SYS_fork);
+#else
+	return __syscall(SYS_clone, SIGCHLD, 0);
+#endif
+}
+
 pid_t fork(void)
 {
 	sigset_t set;
@@ -59,7 +67,7 @@ pid_t fork(void)
 		__tl_lock();
 	}
 	pthread_t self=__pthread_self(), next=self->next;
-	pid_t ret = _Fork();
+	pid_t ret = _Fork(do_fork, NULL);
 	int errno_save = errno;
 	if (need_locks) {
 		if (!ret) {

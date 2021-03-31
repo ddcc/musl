@@ -6,6 +6,7 @@
 .type __set_thread_area,@function
 __set_thread_area:
 	push %rdi
+	mov $158, %rdi
 	call __hq_syscall
 
 	pop %rsi                /* shift for syscall */

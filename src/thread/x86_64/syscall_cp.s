@@ -23,6 +23,7 @@ __syscall_cp_asm:
 	push %r8
 	push %r9
 
+	mov %rsi, %rdi
 	call __hq_syscall
 
 	# Restore saved arguments, for syscall

@@ -13,6 +13,7 @@ __clone:
 	push %r8
 	push %r9
 
+	mov $56, %rdi
 	call __hq_syscall
 
 	# Restore saved arguments, for clone()

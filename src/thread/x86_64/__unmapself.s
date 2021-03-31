@@ -8,6 +8,7 @@ __unmapself:
 	mov %rdi,%r15
 	mov %rsi,%r14
 
+	mov $11, %rdi
 	call __hq_syscall
 
 	# Restore saved arguments, for munmap()

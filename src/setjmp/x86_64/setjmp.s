@@ -21,6 +21,7 @@ setjmp:
 	mov %rsi,56(%rdi)
 
 	lea 56(%rdi),%rdi
+	xor %rdx,%rdx
 	call __hq_pointer_define
 
 	xor %rax,%rax           /* always return 0 */

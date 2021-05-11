@@ -9,7 +9,7 @@
 static void dummy(int x) { }
 weak_alias(dummy, __aio_atfork);
 
-void __hq_init(int fork);
+void __hq_init(int);
 
 pid_t _Fork(int (*func)(void *), void *arg)
 {
@@ -20,11 +20,12 @@ pid_t _Fork(int (*func)(void *), void *arg)
 	LOCK(__abort_lock);
 	ret = (*func)(arg);
 	if (!ret) {
+		struct pthread *self = __pthread_self();
+		self->tid = __hq_raw_syscall0(SYS_gettid);
+
 		// Reinitialize after fork
 		__hq_init(1);
 
-		pthread_t self = __pthread_self();
-		self->tid = __syscall(SYS_gettid);
 		self->robust_list.off = 0;
 		self->robust_list.pending = 0;
 		self->next = self->prev = self;

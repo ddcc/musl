@@ -1748,9 +1748,6 @@ hidden void __dls2(unsigned char *base, size_t *sp)
 
 void __dls2b(size_t *sp, size_t *auxv)
 {
-	/* Initialize HerQules before any system calls occur. */
-	__hq_init(0);
-
 	/* Setup early thread pointer in builtin_tls for ldso/libc itself to
 	 * use during dynamic linking. If possible it will also serve as the
 	 * thread pointer at runtime. */
@@ -1758,9 +1755,12 @@ void __dls2b(size_t *sp, size_t *auxv)
 	libc.auxv = auxv;
 	libc.tls_size = sizeof builtin_tls;
 	libc.tls_align = tls_align;
-	if (__init_tp(__copy_tls((void *)builtin_tls)) < 0) {
+	if (__hq_init_tp(__copy_tls((void *)builtin_tls)) < 0) {
 		a_crash();
 	}
+
+	/* Initialize HerQules after TLS setup. */
+	__hq_init(0);
 
 	struct symdef dls3_def = find_sym(&ldso, "__dls3", 0);
 	if (DL_FDPIC) ((stage3_func)&ldso.funcdescs[dls3_def.sym-ldso.syms])(sp, auxv);

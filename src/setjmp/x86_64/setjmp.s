@@ -2,7 +2,7 @@
 .global __setjmp
 .global _setjmp
 .global setjmp
-.extern __hq_pointer_define
+.extern __hq_object_define
 .type __setjmp,@function
 .type _setjmp,@function
 .type setjmp,@function
@@ -17,12 +17,12 @@ setjmp:
 	mov %r15,40(%rdi)
 	lea 8(%rsp),%rdx        /* this is our rsp WITHOUT current ret addr */
 	mov %rdx,48(%rdi)
-	mov (%rsp),%rsi         /* save return addr ptr for new rip */
-	mov %rsi,56(%rdi)
+	mov (%rsp),%rdx         /* save return addr ptr for new rip */
+	mov %rdx,56(%rdi)
 
-	lea 56(%rdi),%rdi
+	mov $64,%rsi
 	xor %rdx,%rdx
-	call __hq_pointer_define
+	call __hq_object_define
 
 	xor %rax,%rax           /* always return 0 */
 	ret
